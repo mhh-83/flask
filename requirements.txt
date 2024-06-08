@@ -1,0 +1,7 @@
+collections
+flask_wtf
+wtforms
+bcrypt
+Flask
+Flask-SQLalchemy
+flask-cors

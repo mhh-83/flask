@@ -4,7 +4,6 @@ from confige import db
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField
 from wtforms.validators import InputRequired
-from flask_login import UserMixin
 import bcrypt
 
 class UploadForm(FlaskForm):
