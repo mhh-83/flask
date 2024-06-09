@@ -1,14 +1,31 @@
-from flask import request, jsonify, render_template, send_file
-from confige import app, db
-from models import User, UploadForm
+from flask import request, jsonify, render_template, send_file, redirect
+from confige import app, db, jwt
+from auth import auth_bp
+from users import user_bp
+from models import User, UploadForm, Levels
 from werkzeug.utils import secure_filename
 import os
 import io
+
+
+
+
+jwt.init_app(app)
+# register bluepints
+app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(user_bp, url_prefix="/users")
+ # load user
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_headers, jwt_data):
+    identity = jwt_data["sub"]
+
+    return User.query.filter_by(username=identity).one_or_none()
+
+
 @app.route('/download/<filename>', methods=['GET'])
 def get_file(filename):
     path = filename
     if path:
-        
         if os.path.exists(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)):
             file_loaded = []
             
@@ -30,6 +47,30 @@ def get_files():
             return {"message":"مسیر وارد شده وجود ندارد"}, 400
     else:
         return jsonify({"files": os.listdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"]))})
+@app.route('/create/level', methods=['POST'])
+def create_level():
+    data = request.get_json()
+    type = request.args.get("type", "کاوش در منطقه")
+    part = request.args.get("part", "شاهین شهر و میمه")
+    level = request.args.get("level", 1, int)
+    if Levels().get_data(type=type, part=part, level=level):
+        return redirect(f"/update/level?type={type}&part={part}&level={level}")
+    new_level = Levels(type=type, part=part, level=level, data=data)
+    db.session.add(new_level)
+    db.session.commit()
+    return jsonify({"message" : "مرحله با موفقیت ساخته شد"}), 201
+@app.route('/update/level', methods=['POST', 'PATCH'])
+def update_level():
+    
+    type = request.args.get("type", "کاوش در منطقه")
+    part = request.args.get("part", "شاهین شهر و میمه")
+    level = request.args.get("level", 1, int)
+    update = Levels().get_data(type=type, part=part, level=level)
+    if update:
+        update.data = request.get_json()
+        db.session.commit()
+        return jsonify({"message" : "مرحله با موفقیت بروز شد"}), 200
+    return jsonify({"message": "مرحله وجود ندارد"}), 400
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     form = UploadForm()
@@ -42,60 +83,7 @@ def upload_file():
         return render_template("upload.html", form=form, style=render_template("styles.css"))
 @app.route("/")
 def home():
-    print("dafafafafa/fsfsfsfsfs/fsfs.fsf".split("."))
-    
     return render_template("styles.css")
-@app.route("/contacts", methods=["GET"])
-def get_contacts():
-    contacts = User.query.all()
-    json_contacts = list(map(lambda x: x.to_json(), contacts))
-    return "wellcom to our appliction"
-@app.route("/get_data/<string:username>",methods=["GET"])
-def get_data(username):
-    data = {}
-    for key in request.headers.keys():
-        data[key] = request.headers[key]
-    if data.get("User-Token"):
-        token = data["User-Token"]
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(token):
-            return user.to_json()
-        return jsonify(user.check_password(token))
-@app.route("/create", methods=["POST"])
-def create_contact():
-    username = request.json.get("username")
-    password = request.json.get("password")
-    
-    if not username or not password:
-        return (jsonify({"message": "شما باید یک نام کاربری و گذرواژه وارد کنید"}), 400)
-    new_contact = User(username=username, password=password)
-    try:
-        db.session.add(new_contact)
-        db.session.commit()
-    except Exception as e:
-        return (jsonify({"message":str(e)}), 400)
-    
-    return jsonify({"message": "کاربر ساخته شد", "token": new_contact.password}), 201
-@app.route("/update/<int:user_id>", methods=["PATCH"])
-def update_contact(user_id):
-    contact = User.query.get(user_id)
-    if not contact:
-        return jsonify({"message":"کاربر وجود ندارد"}), 404
-    data = request.json
-    contact.username = data.get("username", contact.username)
-    contact.password = data.get("password", contact.password)
-    contact.email = data.get("email", contact.email)
-    db.session.commit()
-    return jsonify({"message": "اطلاعات کاربر بروزرسانی شد"})
-@app.route("/delete/<int:user_id>", methods=["DELETE"])
-def delete_contact(user_id):
-    contact = User.query.get(user_id)
-    if not contact:
-        return jsonify({"message":"کاربر وجود ندارد"}), 404
-    db.session.delete(contact)
-    db.session.commit()
-
-    return jsonify({"message": "اطلاعات کاربر حذف شد"})
 
 if __name__ == "__main__":
     with app.app_context():
