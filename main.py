@@ -31,11 +31,7 @@ def user_lookup_callback(_jwt_headers, jwt_data):
 
     return User.query.filter_by(username=identity).one_or_none()
 
-@app.route('/database', methods=['GET'])
-def get_database():
-    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "instance/data.db"), "rb") as file:
-        file_loaded = io.BytesIO(file.read())
-    return send_file(file_loaded, mimetype="json/applicton")
+
 @app.route('/download/<filename>', methods=['GET'])
 def get_file(filename):
     path = filename
