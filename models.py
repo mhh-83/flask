@@ -1,20 +1,38 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from confige import db
+from sqlalchemy import String, Column
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField
 from wtforms.validators import InputRequired
 from uuid import uuid4
 from datetime import datetime
+
 class UploadForm(FlaskForm):
     file = FileField("Files", [InputRequired()] )
     submit = SubmitField("Upload")
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
-    username = db.Column(db.String(), nullable=False)
-    email = db.Column(db.String(), nullable=False)
-    password = db.Column(db.Text())
-
+    username = db.Column(db.String(), nullable=False, unique=True)
+    phone = Column(String(11), nullable=False, default="09", unique=True)
+    password = db.Column(db.Text(), nullable=False)
+    data = db.Column(db.JSON())
+    
+    def update(self, data, overwrite):
+        if overwrite:
+            for key in self.data.keys():
+                if not data.get(key):
+                    data[key]=self.data.get(key)
+            return data
+        else:
+            d = {}
+            for key in self.data.keys():
+                if not data.get(key):
+                    data[key]=self.data.get(key)
+                else:
+                    data[key] += self.data.get(key)
+                    d[key] = data[key]
+            return [data, d]
     def __repr__(self):
         return f"<User {self.username}>"
 
@@ -27,7 +45,9 @@ class User(db.Model):
     @classmethod
     def get_user_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
-
+    @classmethod
+    def get_user_by_phone(cls, phone):
+        return cls.query.filter_by(phone=phone).first()
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -59,3 +79,6 @@ class TokenBlocklist(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+class UserInterfsce(db.Model):
+    id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
+    data = db.Column(db.JSON())

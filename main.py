@@ -7,7 +7,17 @@ from werkzeug.utils import secure_filename
 import os
 import io
 
-
+def _filter(fil, files):
+    if fil and fil != "":
+        f = []
+        for file in files:
+            
+            if len(file.split(".")) > 1 and fil in file.split(".")[0]:
+                f.append(file)
+        return f
+    else:
+        return files
+   
 
 
 jwt.init_app(app)
@@ -40,28 +50,61 @@ def get_file(filename):
 @app.route('/ListFiles', methods=['GET'])
 def get_files():
     path = request.args.get("path")
+    per_page = request.args.get("per_page", default=50, type=int)
+    page = request.args.get("page", default=1, type=int)
+    filter = request.args.get("filter")
     if path:
         if os.path.exists(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)) :
-            return jsonify({"files": os.listdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path))})
+            files = os.listdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path))
+            f = _filter(filter, files)
+            f2 = []
+            
+            for x, file in enumerate(f):
+                if x >= (page - 1) * per_page and x < page * per_page:
+                    f2.append(file)
+            return jsonify({"files": f2})
         else:
             return {"message":"مسیر وارد شده وجود ندارد"}, 400
     else:
-        return jsonify({"files": os.listdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"]))})
-@app.route('/create/level', methods=['POST'])
+        files = os.listdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"]))
+        f2 = []
+        f = _filter(filter, files)
+        for x, file in enumerate(f):
+            if x >= (page - 1) * per_page and x < page * per_page:
+                f2.append(file)
+        return jsonify({"files": f2})
+
+@app.route('/levels/get', methods=['GET'])
+def get_level():
+    type = request.args.get("type", "کاوش در منطقه")
+    part = request.args.get("part", "شاهین شهر و میمه")
+    level = request.args.get("level", 1, int)
+    level_content = Levels.query.filter_by(type=type, part=part, level=level).first()
+    if level_content:
+        return jsonify({"data": level_content.data})
+    return jsonify({"message" : "مرحله وجود ندارد"}), 400
+@app.route('/levels/max', methods=['GET'])
+def get_max_level():
+    type = request.args.get("type", "کاوش در منطقه")
+    part = request.args.get("part", "شاهین شهر و میمه")
+    level_content = Levels.query.filter_by(type=type, part=part).all()
+    if level_content:
+        return jsonify({"max_level": len(level_content)})
+    return jsonify({"message" : "نوع مراحل یا قسمت وارد شده، وجود ندارد"}), 400
+@app.route('/levels/create', methods=['POST'])
 def create_level():
     data = request.get_json()
     type = request.args.get("type", "کاوش در منطقه")
     part = request.args.get("part", "شاهین شهر و میمه")
     level = request.args.get("level", 1, int)
     if Levels().get_data(type=type, part=part, level=level):
-        return redirect(f"/update/level?type={type}&part={part}&level={level}")
+        return redirect(f"/levels/update?type={type}&part={part}&level={level}")
     new_level = Levels(type=type, part=part, level=level, data=data)
     db.session.add(new_level)
     db.session.commit()
     return jsonify({"message" : "مرحله با موفقیت ساخته شد"}), 201
-@app.route('/update/level', methods=['POST', 'PATCH'])
+@app.route('/levels/update', methods=['POST', 'PATCH'])
 def update_level():
-    
     type = request.args.get("type", "کاوش در منطقه")
     part = request.args.get("part", "شاهین شهر و میمه")
     level = request.args.get("level", 1, int)
@@ -84,7 +127,6 @@ def upload_file():
 @app.route("/")
 def home():
     return render_template("styles.css")
-
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

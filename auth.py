@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, redirect
+from confige import db
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -11,35 +12,66 @@ from models import User, TokenBlocklist
 
 auth_bp = Blueprint("auth", __name__)
 
-
+import requests
+from requests import JSONDecodeError
+def post_request(url, method="", payload={}):
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+       
+    }
+    if method == "GET":
+        response = requests.get(url, headers=headers)
+    if method == "POST":
+        response = requests.post(url, headers=headers)
+    return response
+@auth_bp.post("/verify")
+def verify_user():
+    data = request.get_json()
+    user = User.get_user_by_username(username=data.get("username"))
+    user_p = User.get_user_by_phone(phone=data.get("phone"))
+    code = data.get("code")
+    if user is not None:
+        return jsonify({"error": "نام کاربری از قبل وجود دارد"}), 409
+    if user_p is not None:
+        return jsonify({"error": "شماره تلفن از قبل وجود دارد"}), 409
+    phone :str= data.get("phone")
+    if not phone.startswith("09") or len(phone) != 11:
+        return jsonify({"error":"فرمت شماره نامعتبر است"})
+    post_request(url=f"http://api.payamak-panel.com/post/Send.asmx?from=9850002710076739&username=09999876739&password=0O3LH&to={phone}&text=با سلام کد تائید شما :{code}", method="POST")
+    return jsonify({"response":"در انتظار تائید"})
 @auth_bp.post("/register")
 def register_user():
     data = request.get_json()
 
     user = User.get_user_by_username(username=data.get("username"))
+    user_p = User.get_user_by_phone(phone=data.get("phone"))
 
     if user is not None:
-        return jsonify({"error": "User already exists"}), 409
-
-    new_user = User(username=data.get("username"), email=data.get("email"))
+        return jsonify({"error": "نام کاربری از قبل وجود دارد"}), 409
+    if user_p is not None:
+        return jsonify({"error": "شماره تلفن از قبل وجود دارد"}), 409
+    phone :str= data.get("phone")
+    if not phone.startswith("09") or len(phone) != 11:
+        return jsonify({"error":"فرمت شماره نامعتبر است"})
+    new_user = User(username=data.get("username"), phone=data.get("phone"), data=data.get("data"))
 
     new_user.set_password(password=data.get("password"))
 
     new_user.save()
-
-    return jsonify({"message": "User created"}), 201
+    return redirect(location="/auth/login")
 
 
 @auth_bp.post("/login")
 def login_user():
     data = request.get_json()
-
-    user = User.get_user_by_username(username=data.get("username"))
+    if data.get("username"):
+        user = User.get_user_by_username(username=data.get("username"))
+    else:
+        user = User.get_user_by_phone(phone=data.get("phone"))
 
     if user and (user.check_password(password=data.get("password"))):
         access_token = create_access_token(identity=user.username, expires_delta=False)
         refresh_token = create_refresh_token(identity=user.username)
-
         return (
             jsonify(
                 {
@@ -49,8 +81,10 @@ def login_user():
             ),
             200,
         )
-
-    return jsonify({"error": "Invalid username or password"}), 400
+    if data.get("username"):
+        return jsonify({"error": "نام کاربری یا گذرواژه نادرست است"}), 400
+    else:
+        return jsonify({"error": "شماره تلفن یا گذرواژه نادرست است"}), 400
 
 
 @auth_bp.get("/whoami")
@@ -61,8 +95,29 @@ def whoami():
             "message": "message",
             "user_details": {
                 "username": current_user.username,
-                "email": current_user.email,
+                "phone": current_user.phone,
+                "data":current_user.data
             },
+        }
+    )
+@auth_bp.post("/update")
+@jwt_required()
+def save_data():
+    data = request.get_json()
+    overwrite = request.args.get("overwrite", type=int, default=1)
+    change_data = data
+    if overwrite:
+        current_user.data = current_user.update(data, overwrite)
+    else:
+        d = current_user.update(data, overwrite)
+      
+        current_user.data = d[0]
+        change_data = d[1]
+    db.session.commit()
+    return jsonify(
+        {
+        "message": "اطلاعات زیر بروزرسانی شد",
+        "data":change_data
         }
     )
 
