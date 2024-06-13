@@ -40,7 +40,7 @@ def verify_user():
     phone :str= data.get("phone")
     if not phone.startswith("09") or len(phone) != 11:
         return jsonify({"error":"فرمت شماره نامعتبر است"})
-    print(phone)
+    
     data = {
     'username': "09999876739",
     'password': "0O3LH",

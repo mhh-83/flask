@@ -43,7 +43,7 @@ def get_file(filename):
                 with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path), "rb") as file:
                     file_loaded = io.BytesIO(file.read())
                 return send_file(file_loaded, mimetype="json/applicton")
-            return  {"message":"فایل وارد شده وجود ندارد"}, 400
+            return  {"message":"فایل وارد شده وجود ندارد", "path": os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)}, 400
         else:
             return {"message":"فایل وارد شده وجود ندارد"}, 400
     
