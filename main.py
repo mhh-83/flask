@@ -32,20 +32,7 @@ def user_lookup_callback(_jwt_headers, jwt_data):
     return User.query.filter_by(username=identity).one_or_none()
 
 
-@app.route('/download/<filename>', methods=['GET'])
-def get_file(filename):
-    path = filename
-    if path:
-        if os.path.exists(os.path.join("https://misaghgame.ir", app.config["UPLOAD_FOLDER"], path)):
-            file_loaded = []
-            
-            if len((os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)).split(".")) == 2:
-                with open(os.path.join("https://misaghgame.ir", app.config["UPLOAD_FOLDER"], path), "rb") as file:
-                    file_loaded = io.BytesIO(file.read())
-                return send_file(file_loaded, mimetype="json/applicton")
-            return  {"message":"فایل وارد شده وجود ندارد", "path": os.path.join("https://misaghgame.ir", app.config["UPLOAD_FOLDER"], path)}, 400
-        else:
-            return {"message":"فایل وارد شده وجود ندارد"}, 400
+
     
 @app.route('/ListFiles', methods=['GET'])
 def get_files():
@@ -61,7 +48,7 @@ def get_files():
             
             for x, file in enumerate(f):
                 if x >= (page - 1) * per_page and x < page * per_page:
-                    f2.append(file)
+                    f2.append(f"http://misaghgame.ir/static/files/{path}/{file}")
             return jsonify({"files": f2})
         else:
             return {"message":"مسیر وارد شده وجود ندارد"}, 400
