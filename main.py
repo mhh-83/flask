@@ -36,14 +36,14 @@ def user_lookup_callback(_jwt_headers, jwt_data):
 def get_file(filename):
     path = filename
     if path:
-        if os.path.exists(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)):
+        if os.path.exists(os.path.join("https://misaghgame.ir", app.config["UPLOAD_FOLDER"], path)):
             file_loaded = []
             
             if len((os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)).split(".")) == 2:
-                with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path), "rb") as file:
+                with open(os.path.join("https://misaghgame.ir", app.config["UPLOAD_FOLDER"], path), "rb") as file:
                     file_loaded = io.BytesIO(file.read())
                 return send_file(file_loaded, mimetype="json/applicton")
-            return  {"message":"فایل وارد شده وجود ندارد", "path": os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config["UPLOAD_FOLDER"], path)}, 400
+            return  {"message":"فایل وارد شده وجود ندارد", "path": os.path.join("https://misaghgame.ir", app.config["UPLOAD_FOLDER"], path)}, 400
         else:
             return {"message":"فایل وارد شده وجود ندارد"}, 400
     
