@@ -1,11 +1,12 @@
-from flask import request, jsonify, render_template, send_file, redirect
+from flask import request, jsonify, render_template, redirect
 from confige import app, db, jwt
 from auth import auth_bp
 from users import user_bp
 from models import User, UploadForm, Levels
 from werkzeug.utils import secure_filename
 import os
-import io
+from math import ceil
+import bcrypt 
 
 def _filter(fil, files):
     if fil and fil != "":
@@ -49,7 +50,7 @@ def get_files():
             for x, file in enumerate(f):
                 if x >= (page - 1) * per_page and x < page * per_page:
                     f2.append(f"http://misaghgame.ir/static/files/{path}/{file}")
-            return jsonify({"files": f2})
+            return jsonify({"files": f2, "number_of_page":ceil(len(files) / per_page)})
         else:
             return {"message":"مسیر وارد شده وجود ندارد"}, 400
     else:
@@ -59,7 +60,7 @@ def get_files():
         for x, file in enumerate(f):
             if x >= (page - 1) * per_page and x < page * per_page:
                 f2.append(f"http://misaghgame.ir/static/files/{file}")
-        return jsonify({"files": f2})
+        return jsonify({"files": f2, "number_of_page":ceil(len(files) / per_page)})
 
 @app.route('/levels/get', methods=['GET'])
 def get_level():
@@ -113,7 +114,7 @@ def upload_file():
         return render_template("upload.html", form=form, style=render_template("styles.css"))
 @app.route("/")
 def home():
-    return render_template("styles.css")
+    return render_template("home.html")
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

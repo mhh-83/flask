@@ -1,0 +1,76 @@
+:root{
+    --bg-color:yellow;
+}
+
+@keyframes color_ramp {
+    from{
+       background-color: blue;
+    }
+    to{
+        background-color:purple;
+    }
+    
+}
+@keyframes glow {
+    from{
+       text-shadow: 0px 0px 2px #ff0000;
+    }
+    to{
+        text-shadow: 0px 0px 10px #ff0000;
+    }
+    
+}
+@font-face {
+  src: url(https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900);
+  font-family: "Noto Kufi Arabic", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 50px;
+  font-style: normal;
+}
+body {
+    display: flex;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    animation: color_ramp 5s linear infinite alternate-reverse;
+    font-family: "Noto Kufi Arabic";
+    align-items: center;
+    background-color: rgb(89, 0, 255);
+
+    color: brown;
+    
+}
+
+h1{
+    animation: glow 1s linear alternate-reverse infinite;
+    background-color: #00000000;
+    font-family: myFirstFont;
+    display:flex;
+    color: red;
+    outline-width: 50px;
+    outline-offset: 10px;
+    outline-style:inherit;
+    outline-color: #000000;
+    align-items: center;
+    position: fixed;
+    box-sizing: border-box;
+    margin: auto;
+    top:10%;
+    left: 35%;
+    width: 50%;
+    text-align: center;
+    padding: auto;
+}
+.text{
+    align-items: center;
+    position: fixed;
+    bottom: 40%;
+    right: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-image: linear-gradient(to bottom right, rgb(8, 1, 1), rgb(43, 43, 43));
+
+}
