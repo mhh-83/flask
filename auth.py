@@ -14,16 +14,19 @@ auth_bp = Blueprint("auth", __name__)
 
 import requests
 from requests import JSONDecodeError
-def post_request(url, method="", payload={}):
+def post_request(url, payload={}):
     headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-       
+    'content-type': 'application/x-www-form-urlencoded'
     }
-    if method == "GET":
-        response = requests.get(url, headers=headers)
-    if method == "POST":
-        response = requests.post(url, headers=headers)
-    return response
+
+    requests.packages.urllib3.disable_warnings()
+    session = requests.Session()
+    session.verify = False
+
+    response = session.post(url, data=payload, headers=headers)
+
+    return (response.text)
+    
 @auth_bp.post("/verify")
 def verify_user():
     data = request.get_json()
@@ -37,8 +40,17 @@ def verify_user():
     phone :str= data.get("phone")
     if not phone.startswith("09") or len(phone) != 11:
         return jsonify({"error":"فرمت شماره نامعتبر است"})
-    post_request(url=f"http://api.payamak-panel.com/post/Send.asmx?from=9850002710076739&username=09999876739&password=0O3LH&to={phone}&text=با سلام کد تائید شما :{code}", method="POST")
-    return jsonify({"response":"در انتظار تائید"})
+    data = {
+    'username': "09999876739",
+    'password': "0O3LH",
+    'to': phone,
+    'text': f"با سلام\nبه بازی میثاق خوش آمدید\n کد تائید شما جهت ثبت نام در بازی :\n{code}",
+    'from': "", 
+    'fromSupportOne': "", 
+    'fromSupportTwo': ""
+    }
+    
+    return jsonify({"message":"در انتظار تائید", "response":post_request(url="https://rest.payamak-panel.com/api/SmartSMS/Send", payload=data)})
 @auth_bp.post("/register")
 def register_user():
     data = request.get_json()
