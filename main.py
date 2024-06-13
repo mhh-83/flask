@@ -58,7 +58,7 @@ def get_files():
         f = _filter(filter, files)
         for x, file in enumerate(f):
             if x >= (page - 1) * per_page and x < page * per_page:
-                f2.append(f"http://misaghgame.ir/static/files/{path}/{file}")
+                f2.append(f"http://misaghgame.ir/static/files/{file}")
         return jsonify({"files": f2})
 
 @app.route('/levels/get', methods=['GET'])
