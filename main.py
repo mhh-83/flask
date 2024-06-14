@@ -1,4 +1,4 @@
-from flask import request, jsonify, render_template, redirect
+from flask import request, jsonify, render_template, redirect, make_response
 from confige import app, db, jwt
 from auth import auth_bp
 from users import user_bp
@@ -6,7 +6,7 @@ from models import User, UploadForm, Levels
 from werkzeug.utils import secure_filename
 import os
 from math import ceil
-import bcrypt 
+import bcrypt
 
 def _filter(fil, files):
     if fil and fil != "":
@@ -114,8 +114,11 @@ def upload_file():
         return render_template("upload.html", form=form, style=render_template("styles.css"))
 @app.route("/")
 def home():
-    return render_template("home.html")
+    response = make_response(render_template("home.html"), 200)
+    return response
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+    
     app.run(debug=True)
+    

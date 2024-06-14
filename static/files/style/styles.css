@@ -47,30 +47,61 @@ h1{
     animation: glow 1s linear alternate-reverse infinite;
     background-color: #00000000;
     font-family: myFirstFont;
-    display:flex;
+    display: flex;
     color: red;
     outline-width: 50px;
     outline-offset: 10px;
-    outline-style:inherit;
+    outline-style: inherit;
     outline-color: #000000;
-    align-items: center;
-    position: fixed;
+    align-items: stretch;
     box-sizing: border-box;
-    margin: auto;
-    top:10%;
-    left: 35%;
-    width: 50%;
     text-align: center;
-    padding: auto;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
 }
 .text{
     align-items: center;
     position: fixed;
     bottom: 40%;
+    margin: 1%;
+    border-radius: 10px;
     right: 0;
     top: 0;
     left: 0;
-    width: 100%;
-    background-image: linear-gradient(to bottom right, rgb(8, 1, 1), rgb(43, 43, 43));
+    width: 98%;
+    background-image: linear-gradient(to bottom, rgb(8, 1, 1), rgb(176, 4, 4));
 
+}
+.column{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    height: 80%;
+}
+button{
+    background-color: #21ff2b;
+    height: 40px;
+    width: 150px;
+    border-radius: 10px;
+    border-style: inset;
+    border-color: white;
+    border-width: 4px;
+    outline: 5px inset #07684b;
+    font-size: large;
+    font-family: fantasy;
+    color: #17026c;
+    text-shadow: 1px 1px #fef6ff;
+}
+button:hover {
+    background-color: aqua;
+    box-shadow: 0px 0px 20px white;
+}
+h2{
+    font-size: 1em;
+    color: aliceblue;
+    animation: glow 1s linear alternate-reverse infinite;
 }

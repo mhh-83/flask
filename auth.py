@@ -30,16 +30,24 @@ def post_request(url, payload={}):
 @auth_bp.post("/verify")
 def verify_user():
     data = request.get_json()
+    if not data.get("username"):
+        return jsonify({"error": "نام کاربری  خود را وارد کنید"}), 400
+    password = data.get("password")
+    if not password:
+        return jsonify({"error": "گذرواژه خود را وارد کنید"}), 400
+    if len(password) < 8:
+        return jsonify({"error": "گذرواژه حداقل باید 8 کارکتر باشد"}), 400
     user = User.get_user_by_username(username=data.get("username"))
     user_p = User.get_user_by_phone(phone=data.get("phone"))
     code = data.get("code")
+    
     if user is not None:
         return jsonify({"error": "نام کاربری از قبل وجود دارد"}), 409
     if user_p is not None:
         return jsonify({"error": "شماره تلفن از قبل وجود دارد"}), 409
     phone :str= data.get("phone")
     if not phone.startswith("09") or len(phone) != 11:
-        return jsonify({"error":"فرمت شماره نامعتبر است"})
+        return jsonify({"error":"فرمت شماره نامعتبر است"}), 400
     
     data = {
     'username': "09999876739",
@@ -52,10 +60,29 @@ def verify_user():
     }
     
     return jsonify({"message":"در انتظار تائید", "response":post_request(url="https://rest.payamak-panel.com/api/SmartSMS/Send", payload=data)})
+
+@auth_bp.post("/recovery")
+def recovery_user():
+    data = request.get_json()
+    phone = data.get("phone")
+    code = data.get("code")
+    user = User.get_user_by_phone(phone=phone)
+    if user:
+        data = {
+        'username': "09999876739",
+        'password': "0O3LH",
+        'to': phone,
+        'text': f"با سلام\nبه بازی میثاق خوش آمدید\n  جهت تغییر گذرواژه کد زیر را وارد کنید:\n{code}",
+        'from': "", 
+        'fromSupportOne': "", 
+        'fromSupportTwo': ""
+        }
+        return jsonify({"message":"در انتظار تائید", "response":post_request(url="https://rest.payamak-panel.com/api/SmartSMS/Send", payload=data)})
+    else:
+        return jsonify({"error":"کاربر وجود ندارد"}), 400
 @auth_bp.post("/register")
 def register_user():
     data = request.get_json()
-
     user = User.get_user_by_username(username=data.get("username"))
     user_p = User.get_user_by_phone(phone=data.get("phone"))
 
