@@ -1,13 +1,9 @@
-:root{
-    --bg-color:yellow;
-}
-
 @keyframes color_ramp {
     from{
-       background-color: blue;
+       background: blue;
     }
     to{
-        background-color:purple;
+        background:purple;
     }
     
 }
@@ -20,6 +16,24 @@
     }
     
 }
+@keyframes animate {
+    from{
+       transform: translateY(100vh) scale(0);
+    }
+    to{
+        transform: translateY(-10vh) scale(1);
+    }
+    
+}
+@keyframes rotate {
+    from{
+       transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+    
+}
 @font-face {
   src: url(https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900);
   font-family: "Noto Kufi Arabic", sans-serif;
@@ -27,7 +41,13 @@
   font-weight: 50px;
   font-style: normal;
 }
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 body {
+    min-height: 100vh;
     display: flex;
     left: 0;
     right: 0;
@@ -37,16 +57,13 @@ body {
     animation: color_ramp 5s linear infinite alternate-reverse;
     font-family: "Noto Kufi Arabic";
     align-items: center;
-    background-color: rgb(89, 0, 255);
-
-    color: brown;
     
 }
 
 h1{
     animation: glow 1s linear alternate-reverse infinite;
     background-color: #00000000;
-    font-family: myFirstFont;
+    font-family: Noto Kufi Arabic;
     display: flex;
     color: red;
     outline-width: 50px;
@@ -59,6 +76,7 @@ h1{
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-around;
+    
 }
 .text{
     align-items: center;
@@ -95,6 +113,7 @@ button{
     font-family: fantasy;
     color: #17026c;
     text-shadow: 1px 1px #fef6ff;
+    
 }
 button:hover {
     background-color: aqua;
@@ -104,4 +123,72 @@ h2{
     font-size: 1em;
     color: aliceblue;
     animation: glow 1s linear alternate-reverse infinite;
+    z-index: 2;
+}
+.container{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
+}
+.bubble{
+    position: relative;
+    display: flex;
+    margin: 0;
+
+}
+form{
+    padding: 20px;
+    z-index: 2;
+}
+.bubble span{
+    position: relative;
+    background: #d4ff00;
+    width: 20px;
+    height: 20px;
+    margin:0;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 5px #ffffff88,
+    0 0 50px #ffffff,
+    0 0 100px rgb(255, 255, 255);
+    animation: animate 15s linear infinite;
+    animation-duration: calc(125s / var(--i));
+
+}
+.bubble span:nth-child(even){
+    background: #03d310;
+    box-shadow: 0 0 10px 5px #ffffff88,
+    0 0 50px #ffffff,
+    0 0 100px rgb(255, 255, 255);
+
+}
+.box{
+    position: relative;
+    display: flex;
+    width: 300px;
+    height: 150px;
+    align-items: center;
+    flex-direction: column;
+    border: 5px solid black;
+    border-radius: 10px;
+    background: #000000;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+}
+.box::before{
+    content: "";
+    position: absolute;
+    background-image: linear-gradient(to right, blue, red);
+    width: 120%;
+    height: 40%;
+    animation: rotate 5s linear infinite;
+}
+.box::after{
+    content: "";
+    position: absolute;
+    background: #000000;
+    border-radius: 10px;
+    inset: 5px;
 }
