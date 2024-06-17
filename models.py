@@ -80,5 +80,6 @@ class TokenBlocklist(db.Model):
         db.session.add(self)
         db.session.commit()
 class UserInterface(db.Model):
+    __tablename__ = "game_data"
     id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
     data = db.Column(db.JSON())
