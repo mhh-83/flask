@@ -116,15 +116,13 @@ def upload_file():
 def home():
     response = make_response(render_template("home.html"), 200)
     return response
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
 @app.route("/game/data", methods=["GET"])
 @jwt_required()
 def get_interface():
     data = UserInterface.query.first()
     return jsonify({"data":data})
+
+
 @app.route("/game/data/create", methods=["POST"])
 @jwt_required()
 def create_interface():
@@ -133,3 +131,11 @@ def create_interface():
     db.session.add(game_data)
     db.session.commit()
     return jsonify({"data":game_data})
+
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
+
+
+
