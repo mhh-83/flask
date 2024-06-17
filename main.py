@@ -119,7 +119,7 @@ def home():
 @app.route("/game/data", methods=["GET"])
 @jwt_required()
 def get_interface():
-    data = UserInterface.query.first()
+    data = UserInterface.query.first().data
     return jsonify({"data":data})
 
 
