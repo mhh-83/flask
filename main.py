@@ -148,7 +148,7 @@ def delete_interface():
     game_data = UserInterface.query.all()
     for data in game_data:
         if data.id == id:
-            db.session.delete(game_data)
+            db.session.delete(data)
     db.session.commit()
     return jsonify({"message": "با موفقیت حذف شد"})
 if __name__ == "__main__":
