@@ -116,7 +116,7 @@ def login_user():
             jsonify(
                 {
                     "message": "Logged In ",
-                    "tokens": {"access": access_token, "refresh": refresh_token},
+                    "tokens": {"access": access_token, "refresh": refresh_token, "id":current_user.id},
                 }
             ),
             200,
