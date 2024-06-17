@@ -79,6 +79,6 @@ class TokenBlocklist(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
-class UserInterfsce(db.Model):
+class UserInterface(db.Model):
     id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
     data = db.Column(db.JSON())

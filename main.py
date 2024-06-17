@@ -2,7 +2,7 @@ from flask import request, jsonify, render_template, redirect, make_response
 from confige import app, db, jwt
 from auth import auth_bp
 from users import user_bp
-from models import User, UploadForm, Levels, UserInterfsce
+from models import User, UploadForm, Levels, UserInterface
 from werkzeug.utils import secure_filename
 import os
 from math import ceil
@@ -123,5 +123,5 @@ if __name__ == "__main__":
 @app.route("/game/data", methods=["GET"])
 @jwt_required()
 def get_interface():
-    data = UserInterfsce.query.first()
+    data = UserInterface.query.first()
     return jsonify({"data":data})
