@@ -123,8 +123,7 @@ def get_interface():
     return jsonify({"data":data})
 
 
-@app.route("/game/data/create", methods=["POST"])
-
+@app.route("/gamedata/create", methods=["POST"])
 def create_interface():
     data = request.get_json()
     game_data = UserInterface(data=data)
