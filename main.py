@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 import os
 from math import ceil
 import bcrypt
+from flask_jwt_extended import jwt_required
 
 def _filter(fil, files):
     if fil and fil != "":
