@@ -144,7 +144,7 @@ def update_interface():
 
 @app.route("/gamedata/delete", methods=["DELETE"])
 def delete_interface():
-    id = request.args("id")
+    id = request.args.get("id")
     game_data = UserInterface.query.all()
     for data in game_data:
         if data.id == id:
