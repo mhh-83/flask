@@ -131,6 +131,26 @@ def create_interface():
     db.session.commit()
     return jsonify({"data":data})
 
+@app.route("/gamedata/update", methods=["PUT"])
+def update_interface():
+    data = request.get_json()
+    game_data = UserInterface.query.first()
+    for key in game_data.data.keys():
+        if not data.has(key):
+            data[key] = game_data.data.get(key)
+    game_data.data = data
+    db.session.commit()
+    return jsonify({"data":data})
+
+@app.route("/gamedata/delete", methods=["DELETE"])
+def delete_interface():
+    id = request.args("id")
+    game_data = UserInterface.query.all()
+    for data in game_data:
+        if data.id == id:
+            db.session.delete(game_data)
+    db.session.commit()
+    return jsonify({"message": "با موفقیت حذف شد"})
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
