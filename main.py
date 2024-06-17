@@ -2,7 +2,7 @@ from flask import request, jsonify, render_template, redirect, make_response
 from confige import app, db, jwt
 from auth import auth_bp
 from users import user_bp
-from models import User, UploadForm, Levels
+from models import User, UploadForm, Levels, UserInterfsce
 from werkzeug.utils import secure_filename
 import os
 from math import ceil
@@ -29,7 +29,6 @@ app.register_blueprint(user_bp, url_prefix="/users")
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_headers, jwt_data):
     identity = jwt_data["sub"]
-
     return User.query.filter_by(username=identity).one_or_none()
 
 
@@ -119,6 +118,9 @@ def home():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    
     app.run(debug=True)
-    
+@app.route("/game/data", methods=["GET"])
+@jwt_required()
+def get_interface():
+    data = UserInterfsce.query.first()
+    return jsonify(data)
