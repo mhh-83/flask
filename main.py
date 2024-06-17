@@ -124,4 +124,4 @@ if __name__ == "__main__":
 @jwt_required()
 def get_interface():
     data = UserInterfsce.query.first()
-    return jsonify(data)
+    return jsonify({"data":data})
