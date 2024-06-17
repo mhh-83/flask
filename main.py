@@ -125,3 +125,11 @@ if __name__ == "__main__":
 def get_interface():
     data = UserInterface.query.first()
     return jsonify({"data":data})
+@app.route("/game/data/create", methods=["POST"])
+@jwt_required()
+def create_interface():
+    data = request.get_json()
+    game_data = UserInterface(data=data)
+    db.session.add(game_data)
+    db.session.commit()
+    return jsonify({"data":game_data})
