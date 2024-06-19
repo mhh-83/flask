@@ -136,7 +136,7 @@ def update_interface():
     data = request.get_json()
     game_data = UserInterface.query.first()
     for key in game_data.data.keys():
-        if not data.has(key):
+        if not data.get(key):
             data[key] = game_data.data.get(key)
     game_data.data = data
     db.session.commit()
