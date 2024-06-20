@@ -68,7 +68,7 @@ def get_all_users():
             if not sort or sort == "":
                 u.append(user)
     
-    if sort and sort != "" and user.data.get(sort):
+    if sort and sort != "":
         u3 = []
         u4 = []
         for x, user in enumerate(u):
