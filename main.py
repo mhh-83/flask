@@ -18,7 +18,11 @@ def _filter(fil, files):
                 f.append(file)
         return f
     else:
-        return files
+        f = []
+        for file in files:
+            if len(file.split(".")) > 1:
+                f.append(file)
+        return f
    
 
 
