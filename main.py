@@ -8,7 +8,8 @@ import os
 from math import ceil
 import bcrypt
 from flask_jwt_extended import jwt_required
-
+from flask_socketio import SocketIO, emit
+socket = SocketIO(app=app)
 def _filter(fil, files):
     if fil and fil != "":
         f = []
@@ -155,10 +156,14 @@ def delete_interface():
             db.session.delete(data)
     db.session.commit()
     return jsonify({"message": "با موفقیت حذف شد"})
+
+socket.on("connect")
+def connected(auth):
+    emit("my response", {"data":"connected"})
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    socket.run(app=app, debug=True)
 
 
 

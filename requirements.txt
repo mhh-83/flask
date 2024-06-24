@@ -25,3 +25,4 @@ SQLAlchemy==2.0.20
 typing_extensions==4.7.1
 Werkzeug==2.3.7
 requests
+flask_socketio
