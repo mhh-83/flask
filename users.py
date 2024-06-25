@@ -96,6 +96,7 @@ def get_all_users():
                 if user.data.get(key):
                     d[key] = user.data.get(key)
             user.data = d
+    
     result = UserSchema().dump(u2, many=True)
 
     return (
