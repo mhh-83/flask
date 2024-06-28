@@ -8,6 +8,7 @@ import os
 from math import ceil
 import bcrypt
 from flask_jwt_extended import jwt_required
+import random
 
 def _filter(fil, files):
     if fil and fil != "":
@@ -65,6 +66,18 @@ def get_files():
             if x >= (page - 1) * per_page and x < page * per_page:
                 f2.append(f"http://misaghgame.ir/static/files/{file}")
         return jsonify({"files": f2, "number_of_page":ceil(len(f) / per_page)})
+    
+@app.route('/levels/random', methods=['GET'])
+def get_level():
+    type = request.args.get("type", "لیگ")
+    part = request.args.get("part", 0)
+    max_level = len(Levels.query.filter_by(type=type, part=part).all())
+    level = random.randint(1, max_level)
+    level_content = Levels.query.filter_by(type=type, part=part, level=level).first()
+    if level_content:
+        return jsonify({"data": level_content.data})
+    return jsonify({"message" : "مرحله وجود ندارد"}), 400
+
 
 @app.route('/levels/get', methods=['GET'])
 def get_level():
