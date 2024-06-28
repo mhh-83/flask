@@ -68,7 +68,7 @@ def get_files():
         return jsonify({"files": f2, "number_of_page":ceil(len(f) / per_page)})
     
 @app.route('/levels/random', methods=['GET'])
-def get_level():
+def get_random_level():
     type = request.args.get("type", "لیگ")
     part = request.args.get("part", 0)
     max_level = len(Levels.query.filter_by(type=type, part=part).all())
