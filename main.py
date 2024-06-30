@@ -67,6 +67,7 @@ def get_files():
                 if x >= (page - 1) * per_page and x < page * per_page:
                     f2.append(f"http://misaghgame.ir/static/files/{file}")
             return jsonify({"files": f2, "number_of_page":ceil(len(f) / per_page)})
+    return "شما اجازه دسترسی ندارید", 400
     
 @app.route('/levels/random', methods=['GET'])
 @jwt_required()
@@ -114,6 +115,7 @@ def get_random_level():
                 return jsonify({"data": level_content.data})
             return jsonify({"message" : "مرحله وجود ندارد"}), 400
         return jsonify({"message" : "تعداد دور بیش از حد مجاز"}), 400
+    return "شما اجازه دسترسی ندارید", 400
 
 @app.route('/levels/get', methods=['GET'])
 def get_level():
