@@ -1,8 +1,8 @@
-from flask import request, jsonify, render_template, redirect, make_response
+from flask import request, jsonify, render_template, redirect, make_response, session
 from confige import app, db, jwt
-from auth import auth_bp
+from auth import auth_bp, reset_password
 from users import user_bp
-from models import User, UploadForm, Levels, UserInterface
+from models import User, UploadForm, Levels, UserInterface, ResetPassWord, FlaskForm, PasswordField
 from werkzeug.utils import secure_filename
 import os
 from math import ceil
@@ -10,6 +10,21 @@ import bcrypt
 from flask_jwt_extended import jwt_required, current_user
 import random
 
+import requests
+from requests import JSONDecodeError
+def post_request(url, payload={}, custom_header={}):
+    headers = {
+    'content-type': 'application/json'
+    }
+    for h in custom_header.keys():
+        headers[h] = custom_header[h]
+
+    requests.packages.urllib3.disable_warnings()
+    session = requests.Session()
+    session.verify = False
+    session.encoding = "utf8"
+    response = session.post(url, headers=headers)
+    return (response.text)
 def _filter(fil, files):
     if fil and fil != "":
         f = []
@@ -36,8 +51,16 @@ app.register_blueprint(user_bp, url_prefix="/users")
 def user_lookup_callback(_jwt_headers, jwt_data):
     identity = jwt_data["sub"]
     return User.query.filter_by(username=identity).one_or_none()
-
-
+@app.route("/password/reset", methods=["GET", "POST"])
+def reset_password_user():
+    form:FlaskForm = ResetPassWord()
+   
+    if request.method == 'GET':
+        session["token"] = request.args.get("t")
+    if request.method == "POST":
+        if form.validate_on_submit():
+            return post_request(f"https://misaghgame.ir/auth/ResetPassword?password={form.data.get('password')}", custom_header={"Authorization":f"Bearer {session['token']}"})
+    return render_template("reset_password.html", form=form)
 
     
 @app.route('/ListFiles', methods=['GET'])

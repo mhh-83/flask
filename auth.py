@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, redirect
+from flask import Blueprint, jsonify, request, redirect, render_template
 from confige import db
 from flask_jwt_extended import (
     create_access_token,
@@ -68,14 +68,14 @@ def recovery_user():
     if "GodotEngine" in request.headers.get("User-Agent"):
         data = request.get_json()
         phone = data.get("phone")
-        code = data.get("code")
         user = User.get_user_by_phone(phone=phone)
         if user:
+            access_token = create_access_token(identity=user.username, expires_delta=False)
             data = {
             'username': "09999876739",
             'password': "0O3LH",
             'to': phone,
-            'text': f"با سلام\nبه بازی میثاق خوش آمدید\n  جهت تغییر گذرواژه کد زیر را وارد کنید:\n{code}",
+            'text': f"با سلام\nبه بازی میثاق خوش آمدید\n  جهت تغییر گذرواژه به لینک زیر وارد شوید:\n https://misaghgame.ir/auth/password/reset?t={access_token}",
             'from': "", 
             'fromSupportOne': "", 
             'fromSupportTwo': ""
@@ -84,7 +84,8 @@ def recovery_user():
         else:
             return jsonify({"error":"کاربر وجود ندارد"}), 400
     return "شما اجازه دسترسی ندارید", 400
-    
+
+
 @auth_bp.post("/register")
 def register_user():
     if "GodotEngine" in request.headers.get("User-Agent"):
@@ -136,7 +137,12 @@ def login_user():
     return "شما اجازه دسترسی ندارید", 400
     
 
-
+@auth_bp.post("/ResetPassword")
+@jwt_required()
+def reset_password():
+    current_user.set_password(request.args.get("password"))
+    db.session.commit()
+    return render_template("success.html")
 @auth_bp.get("/whoami")
 @jwt_required()
 def whoami():

@@ -2,8 +2,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from confige import db
 from sqlalchemy import String, Column
 from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField
-from wtforms.validators import InputRequired
+from wtforms import FileField, SubmitField, PasswordField
+from wtforms.validators import InputRequired, EqualTo, Length,UUID
 from uuid import uuid4
 from datetime import datetime
 
@@ -57,7 +57,7 @@ class User(db.Model):
         db.session.commit()
 
 class Levels(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
     type = db.Column(db.String(), nullable=False)
     part = db.Column(db.String(), nullable=False)
     level = db.Column(db.Integer(), nullable=False)
@@ -83,3 +83,11 @@ class UserInterface(db.Model):
     __tablename__ = "game_data"
     id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
     data = db.Column(db.JSON())
+class ResetPassWord(FlaskForm):
+    password = PasswordField('New Password', [InputRequired(), EqualTo('confirm', message='گذرواژگان باید یکی باشند'), Length(8, 20, message="حداقل طول گذرواژه 8 و حداکثر آن 20 حرف می باشد")])
+    confirm  = PasswordField('Repeat Password', [InputRequired()])
+    submit = SubmitField("تغییر")
+    token = ""
+    def set_data(self, password, confirm):
+        self.password.default = password
+        self.confirm.default = confirm

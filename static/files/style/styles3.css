@@ -1,0 +1,200 @@
+@keyframes color_ramp {
+    from{
+       background: blue;
+    }
+    to{
+        background:purple;
+    }
+    
+}
+@keyframes glow {
+    from{
+       text-shadow: 0px 0px 2px #ff0000;
+    }
+    to{
+        text-shadow: 0px 0px 10px #ff0000;
+    }
+    
+}
+@keyframes animate {
+    from{
+       transform: translateY(100vh) scale(0);
+    }
+    to{
+        transform: translateY(-10vh) scale(1);
+    }
+    
+}
+@keyframes rotate {
+    from{
+       transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+    
+}
+@font-face {
+  src: url(https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900);
+  font-family: "Noto Kufi Arabic", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 50px;
+  font-style: normal;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    min-height: 100vh;
+    display: flex;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    animation: color_ramp 5s linear infinite alternate-reverse;
+    font-family: "Noto Kufi Arabic";
+    align-items: center;
+    
+}
+
+h1{
+    animation: glow 1s linear alternate-reverse infinite;
+    background-color: #00000000;
+    font-family: Noto Kufi Arabic;
+    display: flex;
+    color: rgb(0, 255, 17);
+    outline-width: 50px;
+    outline-offset: 10px;
+    outline-style: inherit;
+    outline-color: #000000;
+    align-items: stretch;
+    box-sizing: border-box;
+    text-align: center;
+   
+    
+    
+}
+.text {
+    align-items: center;
+    position: fixed;
+    bottom: 40%;
+    margin: 1%;
+    border-radius: 10px;
+    right: 0;
+    top: 0;
+    left: 0;
+    width: 98%;
+    background-image: linear-gradient(to bottom, rgb(8, 1, 1), rgb(176, 4, 4));
+    display: flex;
+    justify-content: space-evenly;
+}
+.column{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    height: 80%;
+}
+
+
+input#password{
+
+}
+input#submit{
+    background-color: #21ff2b;
+    height: 40px;
+    width: 150px;
+    border-radius: 10px;
+    border-style: inset;
+    border-color: white;
+    border-width: 4px;
+    outline: 5px inset #07684b;
+    font-size: large;
+    font-family: fantasy;
+    color: #17026c;
+    text-shadow: 1px 1px #fef6ff;
+    
+}
+
+li {
+    position: relative;
+    z-index: 3;
+    color: violet;
+    font-size: 15px;
+    padding: 10px;
+}
+input#submit:hover {
+    background-color: aqua;
+    box-shadow: 0px 0px 20px white;
+}
+h2{
+    font-size: 1em;
+    color: aliceblue;
+    animation: glow 1s linear alternate-reverse infinite;
+    z-index: 2;
+}
+
+form {
+    padding: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100%;
+}
+.box{
+    position: relative;
+    display: flex;
+    width: 300px;
+    height: 300px;
+    align-items: center;
+    flex-direction: column;
+    border: 5px solid black;
+    border-radius: 10px;
+    background: #000000;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+}
+.box::before{
+    content: "";
+    position: absolute;
+    background-image: linear-gradient(to right, blue, red);
+    width: 150%;
+    height: 40%;
+    animation: rotate 5s linear infinite;
+}
+.box::after{
+    content: "";
+    position: absolute;
+    background: #000000;
+    border-radius: 10px;
+    inset: 5px;
+}
+input#password {
+    
+    color: #ffffff;
+    background-image: linear-gradient(180deg, #ff7500, #fd6d6d, #ff0b0b);
+    height: 40px;
+    width: 200px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 20px;
+}
+input#confirm {
+    
+    color: #ffffff;
+    background-image: linear-gradient(180deg, #ff7500, #fd6d6d, #ff0b0b);
+    height: 40px;
+    width: 200px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 20px;
+}
