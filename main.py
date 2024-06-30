@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 import os
 from math import ceil
 import bcrypt
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, current_user
 import random
 
 def _filter(fil, files):
@@ -68,25 +68,60 @@ def get_files():
         return jsonify({"files": f2, "number_of_page":ceil(len(f) / per_page)})
     
 @app.route('/levels/random', methods=['GET'])
+@jwt_required()
 def get_random_level():
+    if current_user.data.get("number_play") == None:
+        data = {"number_play":[0, 0, 0, 0, 0, 0]}
+        current_user.data = current_user.update(data=data, overwrite=True)
+        db.session.commit()
+    if current_user.data.get("played_level") == None:
+        data = {"played_level": []}
+        
+        current_user.data = current_user.update(data=data, overwrite=True)
+        filter_data = []
+        db.session.commit()
+    else:
+        filter_data = []
+        for f in current_user.data['played_level']:
+            filter_data.append(f)
+        
     type = request.args.get("type", "لیگ")
     part = request.args.get("part", 0)
-    max_level = len(Levels.query.filter_by(type=type, part=part).all())
-    level = random.randint(1, max_level)
-    level_content = Levels.query.filter_by(type=type, part=part, level=level).first()
-    if level_content:
-        return jsonify({"data": level_content.data})
-    return jsonify({"message" : "مرحله وجود ندارد"}), 400
-
+    
+    max_play = UserInterface.query.first().data["laps_allowed"][int(part.split("type_")[1])]
+    number_play = []
+    for x in current_user.data["number_play"]:
+        number_play.append(x)
+    if len(number_play) > int(part.split("type_")[1]) and number_play[int(part.split("type_")[1])] < max_play:
+        levels = Levels.query.filter_by(type=type, part=part).all()
+        l = []
+        for lv in levels:
+            if not lv.id in filter_data:
+                l.append(lv)
+        max_level = len(l)
+        level_content = None
+        if max_level != 0:
+            level = random.randint(0, max_level-1)
+            level_content = l[level]
+        if level_content:
+            number_play[int(part.split("type_")[1])] += 1
+            filter_data.append(level_content.id)
+            data = {"played_level":filter_data, "number_play":number_play}
+            current_user.data = current_user.update(data=data, overwrite=True)
+            db.session.commit()
+            return jsonify({"data": level_content.data})
+        return jsonify({"message" : "مرحله وجود ندارد"}), 400
+    return jsonify({"message" : "تعداد دور بیش از حد مجاز"}), 400
 
 @app.route('/levels/get', methods=['GET'])
 def get_level():
+    print(request.headers)
     type = request.args.get("type", "کاوش در منطقه")
     part = request.args.get("part", "شاهین شهر و میمه")
     level = request.args.get("level", 1, int)
     level_content = Levels.query.filter_by(type=type, part=part, level=level).first()
     if level_content:
-        return jsonify({"data": level_content.data})
+        return jsonify({"data": level_content.data, "header":request.headers.get("User-Agent")})
     return jsonify({"message" : "مرحله وجود ندارد"}), 400
 @app.route('/levels/max', methods=['GET'])
 def get_max_level():
