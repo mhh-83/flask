@@ -121,7 +121,7 @@ def get_level():
     level = request.args.get("level", 1, int)
     level_content = Levels.query.filter_by(type=type, part=part, level=level).first()
     if level_content:
-        return jsonify({"data": level_content.data, "header":request.headers.get("User-Agent")})
+        return jsonify({"data": level_content.data})
     return jsonify({"message" : "مرحله وجود ندارد"}), 400
 @app.route('/levels/max', methods=['GET'])
 def get_max_level():
