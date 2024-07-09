@@ -13,7 +13,7 @@ from models import User, TokenBlocklist, UserInterface, Levels
 auth_bp = Blueprint("auth", __name__)
 
 import requests
-from requests import JSONDecodeError
+
 def post_request(url, payload={}):
     headers = {
     'content-type': 'application/x-www-form-urlencoded'
