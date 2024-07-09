@@ -3,7 +3,7 @@ from confige import app, db, jwt
 from auth import auth_bp, reset_password
 from users import user_bp
 from books import book_bp
-from models import User, UploadForm, Levels, UserInterface, ResetPassWord, FlaskForm, PasswordField
+from models import User, UploadForm, Levels, UserInterface, ResetPassWord, FlaskForm
 from werkzeug.utils import secure_filename
 import os
 from math import ceil
