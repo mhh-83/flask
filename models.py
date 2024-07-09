@@ -1,19 +1,22 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from confige import db
-from sqlalchemy import String, Column
+from sqlalchemy import String, Column, String, Integer, Text
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField, PasswordField
-from wtforms.validators import InputRequired, EqualTo, Length,UUID
+from wtforms.validators import InputRequired, EqualTo, Length
 from uuid import uuid4
+from shortuuid import uuid
+
 from datetime import datetime
 
 class UploadForm(FlaskForm):
     file = FileField("Files", [InputRequired()] )
     submit = SubmitField("Upload")
+    
 class User(db.Model):
     __tablename__ = "users"
-    id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
-    username = db.Column(db.String(), nullable=False, unique=True)
+    id = db.Column(Integer, primary_key=True)
+    username = db.Column(String(20), nullable=False, unique=True)
     phone = Column(String(11), nullable=False, default="09", unique=True)
     password = db.Column(db.Text(), nullable=False)
     data = db.Column(db.JSON())
@@ -30,7 +33,8 @@ class User(db.Model):
                 if not data.get(key):
                     data[key]=self.data.get(key)
                 else:
-                    data[key] += self.data.get(key)
+                    if data[key] is int:
+                        data[key] += self.data.get(key)
                     d[key] = data[key]
             return [data, d]
     def __repr__(self):
@@ -57,9 +61,9 @@ class User(db.Model):
         db.session.commit()
 
 class Levels(db.Model):
-    id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
-    type = db.Column(db.String(), nullable=False)
-    part = db.Column(db.String(), nullable=False)
+    id = db.Column(Integer, primary_key=True)
+    type = db.Column(db.String(20), nullable=False)
+    part = db.Column(db.String(20), nullable=False)
     level = db.Column(db.Integer(), nullable=False)
     data = db.Column(db.JSON(), nullable=False)
     @classmethod
@@ -69,8 +73,8 @@ class Levels(db.Model):
     def max_levels(cls, type, part):
         return len(cls.query.filter_by(type=type, part=part).all())
 class TokenBlocklist(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    jti = db.Column(db.String(), nullable=True)
+    id = db.Column(Integer, primary_key=True)
+    jti = db.Column(db.String(10), nullable=True)
     create_at = db.Column(db.DateTime(), default=datetime.utcnow)
 
     def __repr__(self):
@@ -81,7 +85,7 @@ class TokenBlocklist(db.Model):
         db.session.commit()
 class UserInterface(db.Model):
     __tablename__ = "game_data"
-    id = db.Column(db.String(), primary_key=True, default=str(uuid4()))
+    id = db.Column(Integer, primary_key=True)
     data = db.Column(db.JSON())
 class ResetPassWord(FlaskForm):
     password = PasswordField('New Password', [InputRequired(), EqualTo('confirm', message='گذرواژگان باید یکی باشند'), Length(8, 20, message="حداقل طول گذرواژه 8 و حداکثر آن 20 حرف می باشد")])
@@ -91,3 +95,12 @@ class ResetPassWord(FlaskForm):
     def set_data(self, password, confirm):
         self.password.default = password
         self.confirm.default = confirm
+
+class Book(db.Model):
+    id = Column("id", Integer, primary_key=True)
+    link = Column("link", String(200), nullable=False)
+    img_refrence = Column("img_refrence", String(200), nullable=False)
+    name = Column("name", String(50), nullable=False)
+    writer = Column("writer", String(40), nullable=False)
+    description = Column("description", Text())
+    

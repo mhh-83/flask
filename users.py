@@ -12,6 +12,8 @@ user_bp = Blueprint("users", __name__)
 def get_me():
     if "GodotEngine" in request.headers.get("User-Agent"):
         sort = request.args.get("sort")
+        if sort == "l":
+            sort = "league_score"
         if sort and sort != "":
             users = User.query.all()
             u = []
@@ -57,7 +59,8 @@ def get_all_users():
         if request.args.get("filter"):
             filter_data =  request.args.get("filter").split("AND")
         sort = request.args.get("sort")
-            
+        if sort == "l":
+            sort = "league_score"
         page = request.args.get("page", default=1, type=int)
 
         per_page = request.args.get("per_page", default=3, type=int)

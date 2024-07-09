@@ -26,3 +26,6 @@ typing_extensions==4.7.1
 Werkzeug==2.3.7
 requests
 flask_socketio
+flask_mysqldb
+sshtunnel
+shortuuid

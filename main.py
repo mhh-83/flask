@@ -2,6 +2,7 @@ from flask import request, jsonify, render_template, redirect, make_response, se
 from confige import app, db, jwt
 from auth import auth_bp, reset_password
 from users import user_bp
+from books import book_bp
 from models import User, UploadForm, Levels, UserInterface, ResetPassWord, FlaskForm, PasswordField
 from werkzeug.utils import secure_filename
 import os
@@ -45,6 +46,7 @@ def _filter(fil, files):
 jwt.init_app(app)
 # register bluepints
 app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(book_bp, url_prefix="/books")
 app.register_blueprint(user_bp, url_prefix="/users")
  # load user
 @jwt.user_lookup_loader
@@ -132,7 +134,12 @@ def get_random_level():
             if level_content:
                 number_play[int(part.split("type_")[1])] += 1
                 filter_data.append(level_content.id)
-                data = {"played_level":filter_data, "number_play":number_play}
+                not_play_levels = []
+                for x in current_user.data.get('not_play_levels', []):
+                    not_play_levels.append(x)
+                if current_user.data.get("last_league_level") != None:
+                    not_play_levels.append(current_user.data.get("last_league_level"))
+                data = {"played_level":filter_data, "number_play":number_play, "last_league_level":level_content.id, "not_play_levels":not_play_levels}
                 current_user.data = current_user.update(data=data, overwrite=True)
                 db.session.commit()
                 return jsonify({"data": level_content.data})

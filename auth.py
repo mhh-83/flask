@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     current_user,
     get_jwt_identity,
 )
-from models import User, TokenBlocklist
+from models import User, TokenBlocklist, UserInterface, Levels
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -75,12 +75,12 @@ def recovery_user():
             'username': "09999876739",
             'password': "0O3LH",
             'to': phone,
-            'text': f"با سلام\nبه بازی میثاق خوش آمدید\n  جهت تغییر گذرواژه به لینک زیر وارد شوید:\n https://misaghgame.ir/auth/password/reset?t={access_token}",
+            'text': f"با سلام\nبه بازی میثاق خوش آمدید\n  جهت تغییر گذرواژه به لینک زیر وارد شوید:\n https://misaghgame.ir/password/reset?t={access_token}",
             'from': "", 
             'fromSupportOne': "", 
             'fromSupportTwo': ""
             }
-            return jsonify({"message":"در انتظار تائید", "response":post_request(url="https://rest.payamak-panel.com/api/SmartSMS/Send", payload=data)})
+            return jsonify({"message":"لینک بازنشانی برای شما ارسال شد", "response":post_request(url="https://rest.payamak-panel.com/api/SmartSMS/Send", payload=data)})
         else:
             return jsonify({"error":"کاربر وجود ندارد"}), 400
     return "شما اجازه دسترسی ندارید", 400
@@ -181,9 +181,118 @@ def save_data():
             }
         )
     return "شما اجازه دسترسی ندارید", 400
+
+@auth_bp.post("/AnswerLeague")
+@jwt_required()
+def answer_league():
     
+    if "GodotEngine" in request.headers.get("User-Agent"):
+        data = request.get_json()
+        id = current_user.data.get("last_league_level")
+        if id != None:
+            level = Levels.query.filter_by(id=id).first()
+            if level:
+                score = 0
+                level_score = level.data.get("score", 0)
+                state = level.data.get("state")
+                user_answers = data.get("data")
+                if state <= 1:
+                    if state == 0:
+                        answers = level.data.get("answers")
+                    else:
+                        answers = level.data.get("data")
+                    l = []
+                    words_length = 0
+                    for answer in answers:
+                        l2 = []
+                        for t in answer:
+                            if t != " ":
+                                words_length += 1
+                            l2.append(t)
+                        l.append(l2)
+                    if user_answers:
+                        all_true = True
+                        for x, answer in enumerate(user_answers):
+                            for y, t in enumerate(answer):
+                                if state == 0:
+                                    z = len(answer) - y -1
+                                else:
+                                    z = y
+                                if t == l[x][z]:
+                                    if t != "":
+                                      score += level_score / words_length
+                                else:
+                                    if l[x][z] != " ":
+                                        all_true = False
+                        if all_true:
+                            score = level_score
+                        else:
+                            score = int(score)
+                if state == 2:
+                    if user_answers == level.data.get("correct_answer"):
+                        score = level_score
+                if state == 3:
+                    correct_answers = []
+                    for answer in level.data.get("options"):
+                        if answer[1] == True:
+                            correct_answers.append(answer[0])
+                    for answer in user_answers:
+                        if answer in correct_answers:
+                            score += level_score
+                        else:
+                            score -= level_score
+                if state == 4:
+                    answers = level.data.get("answers")
+                    for answer in user_answers:
+                        if answer in answers:
+                            score += level_score
+                        else:
+                            if answer != "":
+                                score -= level_score
+                if state == 5:
+                    score = level_score
+                    answers = [level.data.get("first_n"), level.data.get("last_n")]
+                    first_n = []
+                    last_n = []
+                    for t in answers[0]:
+                        first_n.append(t)
+                    for t in answers[1]:
+                        last_n.append(t)
+                    for x, t in enumerate(user_answers[0]):
+                        if t != first_n[x]:
+                            score -= int(level_score / 5)
+                    for x, t in enumerate(user_answers[1]):
+                        if t != last_n[x]:
+                            score -= int(level_score / 5)
+                    if score < 0:
+                        score = 0
+                current_user.data = current_user.update(data={"league_score":score, "last_league_level":None}, overwrite=False)[0]
+                db.session.commit()
+                return jsonify({"score": current_user.data.get("league_score", 0)})
+            return "مرحله وجود ندارد", 400
+        return "مرحله انتخاب نشده", 400
+    return "شما اجازه دسترسی ندارید", 400
 
 
+@auth_bp.get("/OpenLeague")
+@jwt_required()
+def open_league():
+    
+    if "GodotEngine" in request.headers.get("User-Agent"):
+        score = current_user.data.get("score")
+        
+        if score != None:
+            league_score = UserInterface.query.first().data.get("league_score", 1500)
+            if score > league_score:
+                score -= league_score
+                current_user.data = current_user.update(data={"score":score, "league":True, "league_score":0, "number_play":[0, 0, 0, 0, 0, 0], "played_level":[]}, overwrite=True)
+                db.session.commit()
+                return jsonify({"league":True})
+            else:
+                return jsonify({"message":"امتیاز کافی نیست"})
+        else:
+            return jsonify({"message":"امتیاز کافی نیست"})
+    return "شما اجازه دسترسی ندارید", 400
 @auth_bp.get("/refresh")
 @jwt_required(refresh=True)
 def refresh_access():
