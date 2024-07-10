@@ -14,10 +14,11 @@ forwarding_server = SSHTunnelForwarder(
     ssh_password="haghshenas67",
     remote_bind_address=('127.0.0.1', 3306)
 )
+forwarding_server.daemon_forward_servers = True
 forwarding_server.start()
 local_port = forwarding_server.local_bind_port
 # mysql+ssh://pachim@185.79.98.202/pachim@127.0.0.1/data?name=lovely-nilofr&usePrivateKey=true
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///data.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://pachim:haghshenas67@127.0.0.1:{}/data'.format(local_port)
 db = SQLAlchemy(app)
 
 
