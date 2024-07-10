@@ -12,6 +12,8 @@ forwarding_server = SSHTunnelForwarder(
     ('185.79.98.202', 22),
     ssh_username="pachim",
     ssh_password="haghshenas67",
+    ssh_pkey="4dLW3agKOOTnhtvkgNSp4o5X/gkL+Ni6eVNoLa2Xy/A",
+    ssh_private_key_password="haghshenas67",
     remote_bind_address=('127.0.0.1', 3306)
 )
 forwarding_server.daemon_forward_servers = True
