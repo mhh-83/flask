@@ -12,7 +12,7 @@ from flask_jwt_extended import jwt_required, current_user
 import random
 
 import requests
-from requests import JSONDecodeError
+
 def post_request(url, payload={}, custom_header={}):
     headers = {
     'content-type': 'application/json'
