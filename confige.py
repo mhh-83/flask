@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 
 # mysql+ssh://pachim@185.79.98.202/pachim@127.0.0.1/data?name=lovely-nilofr&usePrivateKey=true
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql:///data.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://root@localhost/data'
 db = SQLAlchemy(app)
 
 
