@@ -4,8 +4,7 @@ from sqlalchemy import String, Column, String, Integer, Text
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField, PasswordField
 from wtforms.validators import InputRequired, EqualTo, Length
-from uuid import uuid4
-from shortuuid import uuid
+
 
 from datetime import datetime
 

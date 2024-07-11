@@ -13,7 +13,7 @@ app.config["UPLOAD_FOLDER"] = "static/files"
 
 
 # mysql+ssh://pachim@185.79.98.202/pachim@127.0.0.1/data?name=lovely-nilofr&usePrivateKey=true
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://pachim:haghshenas67@localhost/data'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://pachim:haghshenas67@localhost:3306/data'
 db = SQLAlchemy(app)
 
 
