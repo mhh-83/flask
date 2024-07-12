@@ -8,7 +8,6 @@ from werkzeug.utils import secure_filename
 import os
 from math import ceil
 import bcrypt
-import server
 from flask_jwt_extended import jwt_required, current_user
 import random
 
@@ -269,7 +268,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-    server.asyncio.run(server.main())
 
 
 
